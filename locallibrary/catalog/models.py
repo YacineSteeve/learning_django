@@ -36,7 +36,11 @@ class Language(models.Model):
                  ('ES', 'Spanish'),
                  ('SW', 'Swahili'))
 
-    name = models.CharField(max_length=2, choices=LANGUAGES, default='EN', help_text="The language of the book.")
+    name = models.CharField(max_length=2,
+                            choices=LANGUAGES,
+                            default='EN',
+                            blank=True,
+                            help_text="The language of the book.")
 
     class Meta:
         ordering = ['name']
@@ -64,7 +68,7 @@ class Book(models.Model):
 
     summary = models.TextField(max_length=1000, help_text="A brief summary of the book.")
 
-    languages = models.ManyToManyField(Language, help_text="The language of the book.")
+    languages = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         ordering = ['title', 'author']
@@ -90,7 +94,7 @@ class BookInstance(models.Model):
     due_back = models.DateField(null=True, blank=True)
 
     LOAN_STATUS = (('m', 'Maintenance'),
-                   ('l', 'On loan'),
+                   ('o', 'On loan'),
                    ('r', 'Reserved'),
                    ('a', 'Available'))
 
@@ -104,7 +108,7 @@ class BookInstance(models.Model):
         ordering = ['-due_back']
 
     def __str__(self):
-        return f'{self.id} : {self.book.title} ({self.loan[1]})'
+        return f'{self.id} : {self.book.title} ({self.loan})'
 
 
 class Author(models.Model):
@@ -124,7 +128,7 @@ class Author(models.Model):
         ordering = ['last_name', 'first_name', 'date_of_death']
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.last_name}, {self.first_name}'
 
     def get_absolute_url(self):
         return reverse('author-details', args=[str(self.id)])
