@@ -21,6 +21,7 @@ class Language(models.Model):
     """
     A model representing a language in which a book is published.
     """
+
     LANGUAGES = (('AR', 'Arabic'),
                  ('ZH', 'Chinese (Mandarin)'),
                  ('EN', 'English'),
@@ -46,7 +47,9 @@ class Language(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return self.name
+        for language in self.LANGUAGES:
+            if language[0] == self.name:
+                return language[1]
 
 
 class Book(models.Model):
@@ -56,8 +59,6 @@ class Book(models.Model):
 
     title = models.CharField(max_length=200, help_text="The book title.")
 
-    genres = models.ManyToManyField(Genre, help_text="The book genre.")
-
     author = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True)
 
     isbn = models.CharField('ISBN',
@@ -66,9 +67,16 @@ class Book(models.Model):
                                       '<a href="https://www.isbn-international.org/content/what-isbn">'
                                       'ISBN number</a>')
 
+    genres = models.ManyToManyField(Genre, blank=True)
+
     summary = models.TextField(max_length=1000, help_text="A brief summary of the book.")
 
-    languages = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True)
+    language = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True)
+
+    def display_genre(self):
+        return ', '.join([genre.name for genre in self.genres.all()[:3]])
+
+    display_genre.short_description = 'Genre'
 
     class Meta:
         ordering = ['title', 'author']
@@ -91,24 +99,24 @@ class BookInstance(models.Model):
 
     imprint = models.CharField(max_length=200, help_text="The legal notice of the book.")
 
-    due_back = models.DateField(null=True, blank=True)
+    due_back = models.DateField(null=True, blank=True, help_text="If on loan, the date by which it should be returned.")
 
     LOAN_STATUS = (('m', 'Maintenance'),
                    ('o', 'On loan'),
                    ('r', 'Reserved'),
                    ('a', 'Available'))
 
-    loan = models.CharField(max_length=1,
-                            choices=LOAN_STATUS,
-                            blank=True,
-                            default='m',
-                            help_text="The book availability status.")
+    status = models.CharField(max_length=1,
+                              choices=LOAN_STATUS,
+                              blank=True,
+                              default='m',
+                              help_text="The book availability status.")
 
     class Meta:
         ordering = ['-due_back']
 
     def __str__(self):
-        return f'{self.id} : {self.book.title} ({self.loan})'
+        return f'{self.id} : {self.book.title} ({self.status})'
 
 
 class Author(models.Model):
@@ -120,12 +128,12 @@ class Author(models.Model):
 
     last_name = models.CharField(max_length=100, help_text="The author last name")
 
-    date_of_birth = models.DateField('Born on', null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
 
-    date_of_death = models.DateField('Died on', null=True, blank=True)
+    date_of_death = models.DateField(null=True, blank=True)
 
     class Meta:
-        ordering = ['last_name', 'first_name', 'date_of_death']
+        ordering = ['last_name', 'first_name', 'date_of_birth', 'date_of_death']
 
     def __str__(self):
         return f'{self.last_name}, {self.first_name}'
