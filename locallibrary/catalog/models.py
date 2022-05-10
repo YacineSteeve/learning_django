@@ -14,7 +14,7 @@ class Genre(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return self.name
+        return self.name.capitalize()
 
 
 class Language(models.Model):
@@ -73,7 +73,7 @@ class Book(models.Model):
 
     language = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True)
 
-    def display_genre(self):
+    def display_genre(self) -> str:
         return ', '.join([genre.name for genre in self.genres.all()[:3]])
 
     display_genre.short_description = 'Genre'
