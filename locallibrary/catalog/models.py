@@ -85,7 +85,7 @@ class Book(models.Model):
         return self.title.capitalize()
 
     def get_absolute_url(self):
-        return reverse('book-details', args=[str(self.id)])
+        return reverse('book-detail', args=[str(self.id)])
 
 
 class BookInstance(models.Model):
@@ -139,4 +139,4 @@ class Author(models.Model):
         return f'{self.last_name}, {self.first_name}'
 
     def get_absolute_url(self):
-        return reverse('author-details', args=[str(self.id)])
+        return reverse('author-detail', args=[str(self.id)])

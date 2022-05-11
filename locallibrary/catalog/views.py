@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
+from django.views import generic
 from .models import Book, BookInstance, Author, Genre
 
 
@@ -33,3 +34,12 @@ def index(request: HttpRequest) -> HttpResponse:
     }
 
     return render(request, 'index.html', context)
+
+
+class BookListView(generic.ListView):
+    model = Book
+    paginate_by = 2
+
+
+class BookDetailView(generic.DetailView):
+    model = Book
