@@ -18,10 +18,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
     requested_word = 'u'
     matching_genres = set(genre.name for genre in Genre.objects.filter(name__contains=requested_word))
-    matching_books = ({'title': book.title,
-                       'author': book.author}
-                      for book in Book.objects.filter(title__contains=requested_word)
-                      )
+    matching_books = Book.objects.filter(title__contains=requested_word)
 
     context = {
         'num_books': num_books,
@@ -43,3 +40,12 @@ class BookListView(generic.ListView):
 
 class BookDetailView(generic.DetailView):
     model = Book
+
+
+class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 2
+
+
+class AuthorDetailView(generic.DetailView):
+    model = Author

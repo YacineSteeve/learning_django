@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     {% block title %}
-        <title>Bibliothèque locale</title>
+        <title>Bibliothèque BTAYS, le savoir à portée de clic</title>
     {% endblock %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,7 +24,7 @@
                     <ul class="sidebar-nav">
                         <li><a href="{% url 'index' %}">Home</a></li>
                         <li><a href="{% url 'books' %}">Tous les livres</a></li>
-                        <li><a href="">Tous les auteurs</a></li>
+                        <li><a href="{% url 'authors' %}">Tous les auteurs</a></li>
                     </ul>
                 {% endblock %}
             </div>

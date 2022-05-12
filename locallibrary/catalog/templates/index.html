@@ -1,11 +1,7 @@
 {% extends "base_generic.html" %}
 
-{% block title %}
-    <title>Bibliothèque BTAYS, le savoir à portée de clic</title>
-{% endblock %}
-
 {% block content %}
-    <h1>Accueil de la bibliothèque locale</h1>
+    <h1>Accueil</h1>
     <p>Bienvenue à la bibliothèque locale, un site web développé par <em>Yacine BOUKARI</em> !</p>
     <p>La bibliothèque dispose des enregistrements suivants:</p>
     <ul>
@@ -34,7 +30,12 @@
     <p>Tous les titres contenant " <em>{{ requested_word }}</em> "</p>
     <ul>
         {% for book in matching_books %}
-            <li>{{ book.title }} ({{ book.author }})</li>
+            <li>
+                <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                (
+                <a href="{{ book.author.get_absolute_url }}">{{ book.author }}</a>
+                )
+            </li>
         {% empty %}
             <p>Aucun titre correspondant trouvé</p>
         {% endfor %}
