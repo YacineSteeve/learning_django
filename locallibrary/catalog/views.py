@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.views import generic
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Book, BookInstance, Author, Genre
 
 
@@ -15,6 +16,8 @@ def index(request: HttpRequest) -> HttpResponse:
     num_instances = BookInstance.objects.all().count()
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
     num_authors = Author.objects.count()
+    num_visits = request.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits + 1
 
     requested_word = 'u'
     matching_genres = set(genre.name for genre in Genre.objects.filter(name__contains=requested_word))
@@ -25,6 +28,7 @@ def index(request: HttpRequest) -> HttpResponse:
         'num_instances': num_instances,
         'num_instances_available': num_instances_available,
         'num_authors': num_authors,
+        'num_visits': num_visits,
         'requested_word': requested_word,
         'matching_genres': matching_genres,
         'matching_books': matching_books
@@ -38,7 +42,7 @@ class BookListView(generic.ListView):
     paginate_by = 2
 
 
-class BookDetailView(generic.DetailView):
+class BookDetailView(LoginRequiredMixin, generic.DetailView):
     model = Book
 
 
@@ -47,5 +51,5 @@ class AuthorListView(generic.ListView):
     paginate_by = 2
 
 
-class AuthorDetailView(generic.DetailView):
+class AuthorDetailView(LoginRequiredMixin, generic.DetailView):
     model = Author

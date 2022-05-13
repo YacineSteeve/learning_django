@@ -1,5 +1,10 @@
 {% extends "base_generic.html" %}
 
+
+{% block visits %}
+    <p class="text-muted">You have visited this page {{ num_visits }} time{{ num_visits|pluralize }}.</p>
+{% endblock %}
+
 {% block content %}
     <h1>Accueil</h1>
     <p>Bienvenue à la bibliothèque locale, un site web développé par <em>Yacine BOUKARI</em> !</p>
@@ -10,9 +15,9 @@
         <li><strong>Copies disponibles:</strong> {{ num_instances_available }}</li>
         <li><strong>Auteurs:</strong> {{ num_authors }}</li>
     </ul>
-{% endblock %}
 
-{% block search %}
+    <br/>
+
     <label for="search-input">
         Rechercher dans le catalogue:
     </label>
