@@ -14,7 +14,7 @@ admin.site.register(Language)
 class BookInstanceInline(admin.TabularInline):
     model = BookInstance
     extra = 0
-    fields = ('id', 'status', 'due_back')
+    fields = ('id', 'status', 'due_back', 'borrower')
 
 
 class BookInline(admin.TabularInline):
@@ -47,7 +47,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
-    list_display = ('book', 'status', 'due_back', 'id')
+    list_display = ('book', 'status', 'borrower', 'due_back', 'id')
 
     list_filter = ('due_back', 'status')
 
@@ -56,6 +56,6 @@ class BookInstanceAdmin(admin.ModelAdmin):
             'fields': ('book', 'imprint', 'id')
         }),
         ('Availability', {
-            'fields': ('status', 'due_back')
+            'fields': ('status', 'due_back', 'borrower')
         }),
     )

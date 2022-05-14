@@ -53,3 +53,11 @@ class AuthorListView(generic.ListView):
 
 class AuthorDetailView(LoginRequiredMixin, generic.DetailView):
     model = Author
+
+
+class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_user.html'
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(status__exact='o').filter(borrower=self.request.user).order_by('due_back')

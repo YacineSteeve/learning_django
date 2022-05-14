@@ -1,6 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.urls import reverse
 import uuid
+from datetime import date
 
 
 class Genre(models.Model):
@@ -99,8 +101,6 @@ class BookInstance(models.Model):
 
     imprint = models.CharField(max_length=200, help_text="The legal notice of the book.")
 
-    due_back = models.DateField(null=True, blank=True, help_text="If on loan, the date by which it should be returned.")
-
     LOAN_STATUS = (('m', 'Maintenance'),
                    ('o', 'On loan'),
                    ('r', 'Reserved'),
@@ -112,11 +112,21 @@ class BookInstance(models.Model):
                               default='m',
                               help_text="The book availability status.")
 
+    due_back = models.DateField(null=True, blank=True, help_text="If on loan, the date by which it should be returned.")
+
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
     class Meta:
-        ordering = ['-due_back']
+        ordering = ['due_back']
+        permissions = (
+            ("can_mark_returned", "Set book as returned"),
+        )
 
     def __str__(self):
         return f'{self.id} : {self.book.title} ({self.status})'
+
+    def is_overdue(self):
+        return date.today() > self.due_back if self.due_back else False
 
 
 class Author(models.Model):
