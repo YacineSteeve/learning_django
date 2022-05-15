@@ -23,12 +23,19 @@
                     <li><a href="{% url 'index' %}">Home</a></li>
                     <li><a href="{% url 'books' %}">Tous les livres</a></li>
                     <li><a href="{% url 'authors' %}">Tous les auteurs</a></li>
-                    <br/><br/><br/>
+                    <br/><hr/><br/>
                     {% if user.is_authenticated %}
                         <li>User: {{ user.get_username }}</li>
-                        <br/>
                         <li><a href="{% url 'my-borrowed' %}">My Borrowed</a></li>
                         <br/>
+                        {% if user.is_staff %}
+                            <hr/>
+                            <br/>
+                            <li>Staff</li>
+                            <li><a href="{% url 'all-borrowed' %}">All borrowed</a></li>
+                            <br/>
+                        {% endif %}
+                        <hr/>
                         <li><a href="{% url 'logout' %}?next={{ request.path }}">Logout</a></li>
                         <br/>
                         {% block visits %}

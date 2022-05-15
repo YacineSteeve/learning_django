@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 from django.views import generic
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .models import Book, BookInstance, Author, Genre
 
 
@@ -61,3 +61,11 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return BookInstance.objects.filter(status__exact='o').filter(borrower=self.request.user).order_by('due_back')
+
+
+class LoanedBooksListView(LoginRequiredMixin, generic.ListView):
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed.html'
+
+    def get_queryset(self):
+        return BookInstance.objects.filter(status__exact='o').order_by('due_back')
