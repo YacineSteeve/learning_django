@@ -1,8 +1,13 @@
-from django.shortcuts import render
-from django.http import HttpRequest, HttpResponse
+from django.contrib.auth.decorators import login_required, permission_required
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.views import generic
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 from .models import Book, BookInstance, Author, Genre
+from .forms import RenewBookForm
+import datetime
+from uuid import UUID
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -35,6 +40,38 @@ def index(request: HttpRequest) -> HttpResponse:
     }
 
     return render(request, 'index.html', context)
+
+
+@login_required()
+@permission_required('catalog.can_mark_returned', raise_exception=True)
+def renew_book_librarian(request: HttpRequest, pk: UUID) -> HttpResponse:
+    """
+    View function for renewing a specific BookInstance by librarian.
+    :param request: A HttpRequest
+    :param pk: A valid book instance uuid
+    :return: A HttpResponse (redirection or template to populate).
+    """
+    book_instance = get_object_or_404(BookInstance, pk=pk)
+
+    if request.method == 'POST':
+        form = RenewBookForm(request.POST)
+
+        if form.is_valid():
+            book_instance.due_back = form.cleaned_data['renewal_date']
+            book_instance.save()
+
+            return HttpResponseRedirect(reverse('all-borrowed'))
+
+    else:
+        proposed_renewal_date = datetime.date.today() + datetime.timedelta(weeks=3)
+        form = RenewBookForm(initial={'renewal_date': proposed_renewal_date})
+
+    context = {
+        'form': form,
+        'book_instance': book_instance,
+    }
+
+    return render(request, 'catalog/book_renew_librarian.html', context)
 
 
 class BookListView(generic.ListView):

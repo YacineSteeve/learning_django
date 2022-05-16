@@ -14,7 +14,11 @@
                 <span class="{% if bookinst.is_overdue %}text-danger{% else %}text-success{% endif %}">
                     Due back: {{ bookinst.due_back }}
                 </span>
+                ---
+                <a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a>
+                <br/>
             </li>
+            <br/>
         {% empty %}
             <p>No borrowed books.</p>
         {% endfor %}
