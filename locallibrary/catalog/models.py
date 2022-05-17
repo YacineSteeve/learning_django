@@ -144,6 +144,9 @@ class Author(models.Model):
 
     class Meta:
         ordering = ['last_name', 'first_name', 'date_of_birth', 'date_of_death']
+        permissions = (
+            ('can_mark_returned', 'Set book as returned'),
+        )
 
     def __str__(self):
         return f'{self.last_name}, {self.first_name}'
