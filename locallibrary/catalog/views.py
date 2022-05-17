@@ -2,8 +2,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.views import generic
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.urls import reverse, reverse_lazy
 from .models import Book, BookInstance, Author, Genre
 from .forms import RenewBookForm
 import datetime
@@ -106,3 +106,24 @@ class LoanedBooksListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
+
+
+class AuthorCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.CreateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    initial = {
+        'date_of_birth': datetime.date.today() - datetime.timedelta(weeks=2600),
+    }
+    permission_required = 'can_mark_returned'
+
+
+class AuthorUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.UpdateView):
+    model = Author
+    fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
+    permission_required = 'can_mark_returned'
+
+
+class AuthorDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
+    model = Author
+    success_url = reverse_lazy('authors')
+    permission_required = 'can_mark_returned'
