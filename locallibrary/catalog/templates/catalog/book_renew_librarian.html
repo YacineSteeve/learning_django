@@ -1,7 +1,7 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>Book to renew: {{ book_instance.book.title }}</h1>
+    <h1>Book to renew: {{ book_instance.book }}</h1>
     <p>Borrower:
         {{ book_instance.borrower }}
         ({{ book_instance.borrower.first_name }} {{ book_instance.borrower.last_name }})

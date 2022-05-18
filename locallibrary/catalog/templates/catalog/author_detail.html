@@ -13,7 +13,7 @@
     <ul>
         {% for book in author.book_set.all %}
             <li>
-                <a href="{{ book.get_absolute_url }}">{{ book.title }}</a> ({{ book.bookinstance_set.all.count }})
+                <a href="{{ book.get_absolute_url }}">{{ book }}</a> ({{ book.bookinstance_set.all.count }})
                 <p class="text-muted">{{ book.summary|slice:':200' }}...</p>
             </li>
             <hr/>
