@@ -282,3 +282,39 @@ class RenewBookInstancesViewTest(TestCase):
                                     {'renewal_date': invalid_date_in_future})
         self.assertEqual(response.status_code, 200)
         self.assertFormError(response, 'form', 'renewal_date', 'Invalid date - renewal more than 4 weeks ahead')
+
+
+class AuthorCreateViewTest(TestCase):
+    def setUp(self):
+        test_user_1 = User.objects.create_user(username='test_user_1', password='1X<ISRUkw+tuK')
+        test_user_2 = User.objects.create_user(username='test_user_2', password='2HJ1vRV0Z&3iD')
+
+        test_user_1.save()
+        test_user_2.save()
+
+        required_permission = Permission.objects.get(codename='add_author')
+        test_user_1.user_permissions.add(required_permission)
+        test_user_1.save()
+
+    def test_redirects_if_not_logged_in(self):
+        response = self.client.get(reverse('author-create'))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith('/accounts/login/'))
+
+    def test_redirects_if_logged_in_but_not_correct_permission(self):
+        self.client.login(username='test_user_2', password='2HJ1vRV0Z&3iD')
+        response = self.client.get(reverse('author-create'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_success_if_logged_in_with_required_permission(self):
+        self.client.login(username='test_user_1', password='1X<ISRUkw+tuK>')
+        response = self.client.get(reverse('author-create'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_initial_date(self):
+        self.client.login(username='test_user_1', password='1X<ISRUkw+tuK>')
+        response = self.client.get(reverse('author-create'))
+        self.assertEqual(response.status_code, 302)
+
+        valid_date_in_past = datetime.date.today() - datetime.timedelta(weeks=2600)
+

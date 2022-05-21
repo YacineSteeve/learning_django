@@ -114,19 +114,19 @@ class AuthorCreate(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.Cre
     initial = {
         'date_of_birth': datetime.date.today() - datetime.timedelta(weeks=2600),
     }
-    permission_required = 'can_mark_returned'
+    permission_required = 'catalog.add_author'
 
 
 class AuthorUpdate(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.UpdateView):
     model = Author
     fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death']
-    permission_required = 'can_mark_returned'
+    permission_required = 'catalog.change_author'
 
 
 class AuthorDelete(LoginRequiredMixin, PermissionRequiredMixin, generic.edit.DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
-    permission_required = 'can_mark_returned'
+    permission_required = 'catalog.delete_author'
 
 
 class BookCreate(LoginRequiredMixin, generic.edit.CreateView):
