@@ -298,23 +298,21 @@ class AuthorCreateViewTest(TestCase):
 
     def test_redirects_if_not_logged_in(self):
         response = self.client.get(reverse('author-create'))
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.url.startswith('/accounts/login/'))
+        self.assertRedirects(response, '/accounts/login/?next=/catalog/author/create/')
 
     def test_redirects_if_logged_in_but_not_correct_permission(self):
         self.client.login(username='test_user_2', password='2HJ1vRV0Z&3iD')
-        response = self.client.get(reverse('author-create'))
+        response = self.client.get(reverse('author-create'), follow=True)
         self.assertEqual(response.status_code, 403)
 
     def test_success_if_logged_in_with_required_permission(self):
         self.client.login(username='test_user_1', password='1X<ISRUkw+tuK>')
-        response = self.client.get(reverse('author-create'))
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse('author-create'), follow=True)
+        self.assertRedirects(response, '/accounts/login/?next=/catalog/author/create/')
 
     def test_initial_date(self):
         self.client.login(username='test_user_1', password='1X<ISRUkw+tuK>')
-        response = self.client.get(reverse('author-create'))
-        self.assertEqual(response.status_code, 302)
-
+        response = self.client.get(reverse('author-create'), follow=True)
+        self.assertEqual(response.status_code, 200)
         valid_date_in_past = datetime.date.today() - datetime.timedelta(weeks=2600)
-
+        print(response.context['form'])
