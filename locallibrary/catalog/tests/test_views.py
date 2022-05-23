@@ -286,8 +286,8 @@ class RenewBookInstancesViewTest(TestCase):
 
 class AuthorCreateViewTest(TestCase):
     def setUp(self):
-        test_user_1 = User.objects.create_user(username='test_user_1', password='1X<ISRUkw+tuK')
-        test_user_2 = User.objects.create_user(username='test_user_2', password='2HJ1vRV0Z&3iD')
+        test_user_1 = User.objects.create_user(username='test_user1', password='1X<ISRUkw+tuK')
+        test_user_2 = User.objects.create_user(username='test_user2', password='2HJ1vRV0Z&3iD')
 
         test_user_1.save()
         test_user_2.save()
@@ -296,23 +296,33 @@ class AuthorCreateViewTest(TestCase):
         test_user_1.user_permissions.add(required_permission)
         test_user_1.save()
 
+        self.client.post(reverse('login'), {
+            'username': test_user_1.username,
+            'password': test_user_1.password
+        })
+
+    def tearDown(self):
+        self.client.post(reverse('logout'))
+
     def test_redirects_if_not_logged_in(self):
         response = self.client.get(reverse('author-create'))
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/accounts/login/?next=/catalog/author/create/')
 
     def test_redirects_if_logged_in_but_not_correct_permission(self):
-        self.client.login(username='test_user_2', password='2HJ1vRV0Z&3iD')
+        self.client.post(reverse('logout'))
+        self.client.login(username='test_user2', password='2HJ1vRV0Z&3iD')
         response = self.client.get(reverse('author-create'), follow=True)
         self.assertEqual(response.status_code, 403)
 
     def test_success_if_logged_in_with_required_permission(self):
-        self.client.login(username='test_user_1', password='1X<ISRUkw+tuK>')
         response = self.client.get(reverse('author-create'), follow=True)
-        self.assertRedirects(response, '/accounts/login/?next=/catalog/author/create/')
+        self.assertEqual(response.status_code, 200)
+
+        # self.assertTemplateUsed(response, 'catalog/author_form.html')
 
     def test_initial_date(self):
-        self.client.login(username='test_user_1', password='1X<ISRUkw+tuK>')
         response = self.client.get(reverse('author-create'), follow=True)
         self.assertEqual(response.status_code, 200)
         valid_date_in_past = datetime.date.today() - datetime.timedelta(weeks=2600)
-        print(response.context['form'])
+        # TODO: Finish the initial date test.
