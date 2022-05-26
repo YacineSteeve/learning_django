@@ -1,1 +1,1 @@
-web: gunicorn locallibrary.wsgi
+web: gunicorn locallibrary.locallibrary.wsgi
